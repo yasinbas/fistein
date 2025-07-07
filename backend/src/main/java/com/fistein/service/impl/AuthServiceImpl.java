@@ -19,6 +19,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already in use");
+        }
+        
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
