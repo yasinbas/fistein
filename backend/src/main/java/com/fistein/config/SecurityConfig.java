@@ -16,11 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -33,16 +28,15 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     // PasswordEncoder, parolaları şifrelemek ve doğrulamak için kullanılır.
     private final PasswordEncoder passwordEncoder;
-    // CorsConfigurationSource, CORS politikalarını tanımlamak için kullanılır.
-    // Bu, tarayıcıların farklı kaynaklardan gelen istekleri nasıl işleyeceğini belirler.
+    // CorsConfigurationSource, CorsConfig sınıfında tanımlanan bean'i kullanır
     private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CORS yapılandırmasını etkinleştirir ve belirtilen kaynak yapılandırmasını kullanır.
+                // CORS yapılandırmasını etkinleştirir ve CorsConfig'de tanımlanan corsConfigurationSource bean'ini kullanır.
                 // Bu, tarayıcıların farklı domainlerden gelen istekleri kabul etmesini sağlar.
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // corsConfigurationSource() metodunu çağırarak CORS ayarlarını sağlar
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 // CSRF (Cross-Site Request Forgery) korumasını devre dışı bırakır.
                 // Genellikle API tabanlı uygulamalarda stateless olduğu için devre dışı bırakılır.
                 .csrf(AbstractHttpConfigurer::disable)
@@ -84,24 +78,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         // AuthenticationConfiguration'dan AuthenticationManager'ı alır.
         return config.getAuthenticationManager();
-    }
-
-    // CORS yapılandırmasını sağlayan bir Bean.
-    // Bu metodun adı, yukarıdaki .cors(cors -> cors.configurationSource(corsConfigurationSource())) çağrısıyla eşleşmelidir.
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        // Tüm kaynaklara (domainlere) erişim izni verir. Güvenlik için belirli kaynakları belirtmek daha iyidir.
-        config.setAllowedOriginPatterns(Collections.singletonList("*"));
-        // İzin verilen HTTP metotlarını (GET, POST vb.) ayarlar.
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // İzin verilen başlıkları ayarlar. "Authorization" başlığı JWT için önemlidir.
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-        // Kimlik bilgilerinin (çerezler, HTTP kimlik doğrulama) isteklerle birlikte gönderilmesine izin verir.
-        config.setAllowCredentials(true);
-        // Tüm yollara bu CORS yapılandırmasını uygular.
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 }
