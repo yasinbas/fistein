@@ -80,19 +80,32 @@ Tüm ekran tasarımları `wireframes/` klasöründe yer almaktadır.
 
 ---
 
-## 📋 Geliştirme Yol Haritası
+## ✅ Proje Durumu
 
-GitHub Projects sekmesinde bir **Kanban board** oluşturulmalı:
+| Bileşen    | Durum      | Açıklama                                    |
+| ---------- | ---------- | ------------------------------------------- |
+| Backend    | ✅ Tamamlandı | Spring Boot API tam çalışır durumda      |
+| Frontend   | ✅ Tamamlandı | React ana yapı ve temel sayfalar hazır   |
+| Mobile     | ❌ Bekliyor   | React Native uygulaması henüz başlanmadı  |
 
-### 🔨 Kolonlar:
+### 🎯 Frontend Özellikleri (Tamamlandı)
 
-* TODO
-* IN PROGRESS
-* DONE
+* ✅ JWT Authentication (Giriş/Kayıt)
+* ✅ Responsive Layout ve Navigation
+* ✅ Dashboard ile bakiye görüntüleme
+* ✅ Tailwind CSS styling
+* ✅ TypeScript type safety
+* ✅ API integration hazır
+* ⏳ Grup yönetimi (placeholder)
+* ⏳ Harcama yönetimi (placeholder)
 
-### 🎯 İlk İşler (Issues):
+### � Sonraki Adımlar
 
-*
+1. **Grup yönetimi sayfaları** (CRUD operations)
+2. **Harcama ekleme/düzenleme** sayfaları
+3. **Mobile app** geliştirme (React Native)
+4. **Testing** suite ekleme
+5. **Deployment** için Docker setup
 
 ---
 
