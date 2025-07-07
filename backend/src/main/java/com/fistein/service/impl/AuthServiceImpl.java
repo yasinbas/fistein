@@ -5,6 +5,7 @@ import com.fistein.dto.RegisterRequest;
 import com.fistein.dto.JwtResponse;
 import com.fistein.entity.User;
 import com.fistein.repository.UserRepository;
+import com.fistein.security.JwtUtil;
 import com.fistein.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,9 +17,15 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public JwtResponse register(RegisterRequest request) {
+        // Email kontrolü
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Bu email adresi zaten kullanılıyor");
+        }
+
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -27,20 +34,22 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        // Token üretimi (bir sonraki adımda)
-        return new JwtResponse("fake-jwt-token");
+        // Gerçek JWT token üretimi
+        String token = jwtUtil.generateToken(user.getEmail());
+        return new JwtResponse(token);
     }
 
     @Override
     public JwtResponse login(LoginRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Geçersiz kimlik bilgileri");
         }
 
-        // Token üretimi (bir sonraki adımda)
-        return new JwtResponse("fake-jwt-token");
+        // Gerçek JWT token üretimi
+        String token = jwtUtil.generateToken(user.getEmail());
+        return new JwtResponse(token);
     }
 }
