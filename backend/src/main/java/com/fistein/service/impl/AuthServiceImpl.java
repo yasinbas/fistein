@@ -5,7 +5,7 @@ import com.fistein.dto.RegisterRequest;
 import com.fistein.dto.JwtResponse;
 import com.fistein.entity.User;
 import com.fistein.repository.UserRepository;
-import com.fistein.security.JwtUtil; // Bu import doğru olanı
+import com.fistein.util.JwtUtil;
 import com.fistein.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
