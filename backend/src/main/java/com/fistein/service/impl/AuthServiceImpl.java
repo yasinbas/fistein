@@ -6,7 +6,11 @@ import com.fistein.dto.JwtResponse;
 import com.fistein.entity.User;
 import com.fistein.repository.UserRepository;
 import com.fistein.service.AuthService;
+import com.fistein.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +20,17 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public JwtResponse register(RegisterRequest request) {
+        // Email kontrolü
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Bu email adresi zaten kullanılıyor");
+        }
+
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -27,20 +39,30 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        // Token üretimi (bir sonraki adımda)
-        return new JwtResponse("fake-jwt-token");
+        // JWT token üret
+        var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        var jwtToken = jwtUtil.generateToken(userDetails);
+
+        return new JwtResponse(jwtToken);
     }
 
     @Override
     public JwtResponse login(LoginRequest request) {
+        // Authentication kontrolü
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
-        }
+        // JWT token üret
+        var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        var jwtToken = jwtUtil.generateToken(userDetails);
 
-        // Token üretimi (bir sonraki adımda)
-        return new JwtResponse("fake-jwt-token");
+        return new JwtResponse(jwtToken);
     }
 }
