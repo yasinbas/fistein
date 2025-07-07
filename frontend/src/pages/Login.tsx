@@ -4,7 +4,7 @@ import { Receipt, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      await login({ username, password });
+      await login({ email, password });
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
@@ -51,18 +51,18 @@ const Login: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Kullanıcı Adı
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                E-posta Adresi
               </label>
               <input
-                id="username"
-                name="username"
-                type="text"
+                id="email"
+                name="email"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="input-field mt-1"
-                placeholder="Kullanıcı adınızı girin"
+                placeholder="E-posta adresinizi girin"
               />
             </div>
 
