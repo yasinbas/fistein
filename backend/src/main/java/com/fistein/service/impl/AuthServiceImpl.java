@@ -3,6 +3,7 @@ package com.fistein.service.impl;
 import com.fistein.dto.LoginRequest;
 import com.fistein.dto.RegisterRequest;
 import com.fistein.dto.JwtResponse;
+import com.fistein.dto.UserResponse;
 import com.fistein.entity.User;
 import com.fistein.repository.UserRepository;
 import com.fistein.util.JwtUtil;
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -21,14 +24,14 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager; // main dalından eklendi
-    private final UserDetailsService userDetailsService; // main dalından eklendi
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public JwtResponse register(RegisterRequest request) {
         // Email kontrolü
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Bu email adresi zaten kullanılıyor"); // cursor dalından korundu
+            throw new RuntimeException("Bu email adresi zaten kullanılıyor");
         }
 
         var user = User.builder()
@@ -39,11 +42,20 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        // JWT token üretimi için UserDetails kullanılıyor (main dalındaki mantık)
+        // JWT token üretimi için UserDetails kullanılıyor
         var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        var jwtToken = jwtUtil.generateToken(userDetails); // JwtUtil'in UserDetails alan generateToken metodunu kullanır
+        var jwtToken = jwtUtil.generateToken(userDetails);
 
-        return new JwtResponse(jwtToken);
+        // UserResponse oluşturma
+        var userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getEmail()) // Email'i username olarak kullan
+                .email(user.getEmail())
+                .fullName(user.getName())
+                .createdAt(user.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .build();
+
+        return new JwtResponse(jwtToken, userResponse);
     }
 
     @Override
@@ -57,15 +69,21 @@ public class AuthServiceImpl implements AuthService {
         );
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı")); // cursor dalından korundu
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        // Parola kontrolü AuthenticationManager tarafından zaten yapıldığı için burada tekrar etmiyoruz.
-        // Eğer AuthenticationManager başarısız olursa, bir AuthenticationException fırlatır.
-
-        // JWT token üretimi için UserDetails kullanılıyor (main dalındaki mantık)
+        // JWT token üretimi için UserDetails kullanılıyor
         var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        var jwtToken = jwtUtil.generateToken(userDetails); // JwtUtil'in UserDetails alan generateToken metodunu kullanır
+        var jwtToken = jwtUtil.generateToken(userDetails);
 
-        return new JwtResponse(jwtToken);
+        // UserResponse oluşturma
+        var userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getEmail()) // Email'i username olarak kullan
+                .email(user.getEmail())
+                .fullName(user.getName())
+                .createdAt(user.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .build();
+
+        return new JwtResponse(jwtToken, userResponse);
     }
 }

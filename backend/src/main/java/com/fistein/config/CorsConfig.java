@@ -40,11 +40,11 @@ public class CorsConfig {
         // Credential'ların gönderilmesine izin ver
         configuration.setAllowCredentials(true);
         
-        // Preflight cache süresi (saniye)
-        configuration.setMaxAge(3600L);
+        // Preflight cache süresi (saniye) - Reduced to prevent caching issues
+        configuration.setMaxAge(60L);
         
         // Response'da görünmesine izin verilen header'lar
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setExposedHeaders(List.of("Authorization", "Cache-Control"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
