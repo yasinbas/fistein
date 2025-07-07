@@ -22,7 +22,7 @@ public class UserController {
         
         return UserResponse.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .username(user.getName())
                 .email(user.getEmail())
                 .build();
     }

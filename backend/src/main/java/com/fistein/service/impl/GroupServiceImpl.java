@@ -325,7 +325,7 @@ public class GroupServiceImpl implements GroupService {
     private UserResponse mapToUserResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .username(user.getName())
                 .email(user.getEmail())
                 .build();
     }
