@@ -3,7 +3,7 @@ package com.fistein.service.impl;
 import com.fistein.dto.LoginRequest;
 import com.fistein.dto.RegisterRequest;
 import com.fistein.dto.JwtResponse;
-import com.fistein.entity.User;
+import com.fistein.entitiy.User;
 import com.fistein.repository.UserRepository;
 import com.fistein.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,10 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already in use");
         }
 
         // Token üretimi (bir sonraki adımda)
