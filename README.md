@@ -109,6 +109,14 @@ Tüm ekran tasarımları `wireframes/` klasöründe yer almaktadır.
 
 ---
 
-## 📄 Lisans
+## � Dokümantasyon
+
+Detaylı proje dokümantasyonu ve API referansı için [`docs/`](./docs/) klasörünü ziyaret edin:
+
+- **[📋 Proje Dokümantasyonu](./docs/PROJECT_DOCUMENTATION.md)** - Mimari, kurulum, geliştirme rehberi
+- **[🔌 API Dokümantasyonu](./docs/API_DOCUMENTATION.md)** - Kapsamlı API referansı
+- **[📚 Dokümantasyon İndeksi](./docs/README.md)** - Dokümantasyon ana sayfası
+
+## �📄 Lisans
 
 Bu proje MIT lisansı ile lisanslanmıştır.
