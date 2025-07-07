@@ -1,0 +1,18 @@
+# Java / Spring
+/target
+*.iml
+*.class
+*.log
+*.jar
+
+# Node / React / React Native
+node_modules
+dist
+.expo
+.expo-shared
+.env
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
