@@ -34,7 +34,8 @@ public class CorsConfig {
                 "Content-Type",
                 "Accept",
                 "Origin",
-                "X-Requested-With"
+                "X-Requested-With",
+                "Cache-Control"
         ));
         
         // Credential'ların gönderilmesine izin ver
