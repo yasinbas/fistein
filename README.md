@@ -2,6 +2,8 @@
 
 **Fiştein**, arkadaş grupları ve ev arkadaşları için geliştirilmiş bir ortak gider takibi uygulamasıdır. Splitwise benzeri sade bir arayüz sunar. Hem web hem de mobil platformlarda çalışacak şekilde tasarlanmıştır.
 
+**🌐 Production URL**: https://app.fistein.info
+
 ---
 
 ## 🚀 Özellikler
@@ -11,6 +13,7 @@
 * Kişisel bakiye ve alacak/borç durumu
 * Web ve mobil uyumlu (responsive)
 * JWT ile kullanıcı kimlik doğrulama
+* Google OAuth entegrasyonu
 * Kullanıcı dostu arayüz
 
 ---
@@ -19,12 +22,13 @@
 
 | Katman     | Teknoloji                      |
 | ---------- | ------------------------------ |
-| Backend    | Spring Boot (Java)             |
+| Backend    | Spring Boot (Java 21)         |
 | Frontend   | React + Vite + Tailwind        |
 | Mobil      | React Native + Expo            |
 | Veritabanı | PostgreSQL                     |
-| Auth       | JWT                            |
-| Deployment | Render (backend), Vercel (web) |
+| Auth       | JWT + Google OAuth             |
+| Deployment | Docker + Nginx                 |
+| Domain     | fistein.info                   |
 
 ---
 
@@ -35,13 +39,71 @@ fistein/
 ├── backend/           # Spring Boot backend
 ├── frontend/          # React (Vite + Tailwind)
 ├── mobile/            # React Native (Expo)
+├── nginx/             # Nginx reverse proxy config
+├── scripts/           # Deployment scripts
 ├── wireframes/        # Wireframe görselleri
-└── README.md
+├── docker-compose.yml # Development setup
+├── docker-compose.production.yml # Production setup
+└── DEPLOYMENT_GUIDE.md # Production deployment rehberi
 ```
 
 ---
 
-## 📦 Projeyi Çalıştırma
+## 🌐 URLs
+
+### Production
+- **Ana Site**: https://fistein.info (→ app.fistein.info'ya yönlendirir)
+- **Web App**: https://app.fistein.info
+- **API**: https://api.fistein.info/api
+
+### Development
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080/api
+
+---
+
+## � Hızlı Başlangıç
+
+### Development Ortamı
+
+```bash
+# 1. Projeyi klonlayın
+git clone <repository-url>
+cd fistein
+
+# 2. Kurulum scriptini çalıştırın
+./scripts/setup.sh
+
+# 3. Environment dosyalarını düzenleyin
+# frontend/.env.development ve backend/.env dosyalarını güncelleyin
+
+# 4. Uygulamayı build edin
+./scripts/build.sh development
+
+# 5. Development ortamını başlatın
+./scripts/deploy.sh development
+```
+
+### Production Deployment
+
+Detaylı production deployment rehberi için: **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**
+
+```bash
+# 1. Production environment ayarları
+cp .env.production .env.production.local
+# .env.production.local dosyasını düzenleyin
+
+# 2. SSL sertifikası oluşturun
+# (Rehberde detayları mevcuttur)
+
+# 3. Production build ve deployment
+./scripts/build.sh production
+./scripts/deploy.sh production
+```
+
+---
+
+## 📦 Manuel Kurulum
 
 ### Backend (Spring Boot)
 
@@ -58,12 +120,51 @@ npm install
 npm run dev
 ```
 
-### Mobile (Expo)
+### Database (PostgreSQL)
 
 ```bash
-cd mobile
-npm install
-npx expo start
+# Docker ile
+docker run -d \
+  --name fistein-postgres \
+  -e POSTGRES_DB=fistein_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=Ysn2025! \
+  -p 5432:5432 \
+  postgres:15-alpine
+```
+
+---
+
+## 🔧 Geliştirme
+
+### Environment Variables
+
+#### Frontend (.env.development)
+```env
+VITE_API_BASE_URL=http://localhost:8080/api
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+```
+
+#### Backend (.env)
+```env
+DATABASE_URL=jdbc:postgresql://localhost:5432/fistein_db
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=Ysn2025!
+JWT_SECRET=your-jwt-secret
+GOOGLE_CLIENT_ID=your-google-client-id
+```
+
+### Scripts
+
+```bash
+# Kurulum
+./scripts/setup.sh
+
+# Build
+./scripts/build.sh [development|production]
+
+# Deployment
+./scripts/deploy.sh [development|production]
 ```
 
 ---
@@ -87,10 +188,12 @@ Tüm ekran tasarımları `wireframes/` klasöründe yer almaktadır.
 | Backend    | ✅ Tamamlandı | Spring Boot API tam çalışır durumda      |
 | Frontend   | ✅ Tamamlandı | React ana yapı ve temel sayfalar hazır   |
 | Mobile     | ❌ Bekliyor   | React Native uygulaması henüz başlanmadı  |
+| Deployment | ✅ Tamamlandı | Docker + Production ready                |
 
 ### 🎯 Frontend Özellikleri (Tamamlandı)
 
 * ✅ JWT Authentication (Giriş/Kayıt)
+* ✅ Google OAuth entegrasyonu
 * ✅ Responsive Layout ve Navigation
 * ✅ Dashboard ile bakiye görüntüleme
 * ✅ Tailwind CSS styling
@@ -99,24 +202,60 @@ Tüm ekran tasarımları `wireframes/` klasöründe yer almaktadır.
 * ⏳ Grup yönetimi (placeholder)
 * ⏳ Harcama yönetimi (placeholder)
 
-### � Sonraki Adımlar
+### 🎯 Production Özellikleri (Yeni!)
+
+* ✅ **Docker containerization**
+* ✅ **Nginx reverse proxy**
+* ✅ **SSL/HTTPS support**
+* ✅ **Multi-domain setup** (app.fistein.info, api.fistein.info)
+* ✅ **Environment separation**
+* ✅ **Health checks**
+* ✅ **Security headers**
+* ✅ **Rate limiting**
+* ✅ **Production-ready logging**
+
+### 🎯 Sonraki Adımlar
 
 1. **Grup yönetimi sayfaları** (CRUD operations)
 2. **Harcama ekleme/düzenleme** sayfaları
 3. **Mobile app** geliştirme (React Native)
 4. **Testing** suite ekleme
-5. **Deployment** için Docker setup
+5. **CI/CD** pipeline setup
+6. **Monitoring** ve alerting
 
 ---
 
-## � Dokümantasyon
+## 📚 Dokümantasyon
 
 Detaylı proje dokümantasyonu ve API referansı için [`docs/`](./docs/) klasörünü ziyaret edin:
 
 - **[📋 Proje Dokümantasyonu](./docs/PROJECT_DOCUMENTATION.md)** - Mimari, kurulum, geliştirme rehberi
 - **[🔌 API Dokümantasyonu](./docs/API_DOCUMENTATION.md)** - Kapsamlı API referansı
-- **[📚 Dokümantasyon İndeksi](./docs/README.md)** - Dokümantasyon ana sayfası
+- **[� Deployment Rehberi](./DEPLOYMENT_GUIDE.md)** - Production deployment adımları
+- **[�📚 Dokümantasyon İndeksi](./docs/README.md)** - Dokümantasyon ana sayfası
 
-## �📄 Lisans
+---
+
+## 🔒 Güvenlik
+
+- **HTTPS** zorlaması
+- **JWT** token authentication
+- **Google OAuth** entegrasyonu
+- **CORS** yapılandırması
+- **Rate limiting**
+- **Security headers** (CSP, HSTS, XSS Protection)
+- **Non-root** container execution
+
+---
+
+## 📞 Destek
+
+- **Issues**: GitHub Issues
+- **Documentation**: `/docs` klasörü
+- **Deployment**: `DEPLOYMENT_GUIDE.md`
+
+---
+
+## 📄 Lisans
 
 Bu proje MIT lisansı ile lisanslanmıştır.

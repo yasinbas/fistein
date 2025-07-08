@@ -16,11 +16,17 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // İzin verilen origin'ler (development için)
+        // İzin verilen origin'ler (development ve production için)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",  // React
-                "http://localhost:5173",  // Vite
-                "http://localhost:8081"   // React Native Expo
+                // Development
+                "http://localhost:3000",  // React dev
+                "http://localhost:5173",  // Vite dev
+                "http://localhost:8081",  // React Native Expo
+                // Production
+                "https://fistein.info",   // Production domain
+                "https://www.fistein.info", // Production www subdomain
+                "https://app.fistein.info", // Production app subdomain
+                "https://api.fistein.info"  // Production API subdomain
         ));
         
         // İzin verilen HTTP metodları

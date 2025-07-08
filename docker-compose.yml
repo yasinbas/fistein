@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fistein-postgres
+    environment:
+      POSTGRES_DB: fistein_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Ysn2025!
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migration/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - fistein-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fistein-backend
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/fistein_db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: Ysn2025!
+      JWT_SECRET: dGhpc0lzQUdvb2RTZWNyZXRLZXlGb3JKV1RUaGF0SXNBVE1lYXN0MjU2Qml0c0xvbmdGb3JTZWN1cml0eVB1cnBvc2Vz
+      JWT_EXPIRATION: 86400
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+      SPRING_PROFILES_ACTIVE: production
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fistein-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+    container_name: fistein-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - fistein-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  fistein-network:
+    driver: bridge
