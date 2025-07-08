@@ -41,7 +41,7 @@ const Login: React.FC = () => {
   }, [googleLogin, navigate]);
 
   useEffect(() => {
-    // Load Google Identity Services script
+
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -57,7 +57,7 @@ const Login: React.FC = () => {
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup script when component unmounts
+
       if (document.head.contains(script)) {
         document.head.removeChild(script);
       }
