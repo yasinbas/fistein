@@ -90,3 +90,24 @@ export interface GroupBalance {
   groupName: string;
   balances: BalanceDetail[];
 }
+
+// Google API types
+export interface GoogleCredentialResponse {
+  credential: string;
+}
+
+export interface GoogleError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
+export interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}

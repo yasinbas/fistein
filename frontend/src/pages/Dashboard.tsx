@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Users, Receipt, TrendingUp, TrendingDown } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../utils/useAuth';
 import { authAPI, groupsAPI, expensesAPI } from '../services/api';
 import type { Balance, Group, Expense } from '../types';
 

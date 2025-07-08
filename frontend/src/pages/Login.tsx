@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Receipt, LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../utils/useAuth';
+import type { GoogleCredentialResponse, ApiError } from '../types';
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (response: GoogleCredentialResponse) => void }) => void;
+          prompt: () => void;
+        };
+      };
+    };
+  }
+}
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +26,20 @@ const Login: React.FC = () => {
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
+  const handleGoogleCredentialResponse = useCallback(async (response: GoogleCredentialResponse) => {
+    try {
+      setLoading(true);
+      setError('');
+      await googleLogin({ idToken: response.credential });
+      navigate('/');
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Google ile giriş yapılamadı.');
+    } finally {
+      setLoading(false);
+    }
+  }, [googleLogin, navigate]);
+
   useEffect(() => {
     // Load Google Identity Services script
     const script = document.createElement('script');
@@ -19,8 +47,8 @@ const Login: React.FC = () => {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      if ((window as any).google) {
-        (window as any).google.accounts.id.initialize({
+      if (window.google) {
+        window.google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your-google-client-id',
           callback: handleGoogleCredentialResponse,
         });
@@ -34,24 +62,11 @@ const Login: React.FC = () => {
         document.head.removeChild(script);
       }
     };
-  }, []);
-
-  const handleGoogleCredentialResponse = async (response: any) => {
-    try {
-      setLoading(true);
-      setError('');
-      await googleLogin({ idToken: response.credential });
-      navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Google ile giriş yapılamadı.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [handleGoogleCredentialResponse]);
 
   const handleGoogleLogin = () => {
-    if ((window as any).google) {
-      (window as any).google.accounts.id.prompt();
+    if (window.google) {
+      window.google.accounts.id.prompt();
     } else {
       setError('Google login yüklenemedi. Lütfen sayfayı yenileyin.');
     }
@@ -65,8 +80,9 @@ const Login: React.FC = () => {
     try {
       await login({ email, password });
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
     } finally {
       setLoading(false);
     }

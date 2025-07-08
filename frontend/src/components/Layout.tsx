@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../utils/useAuth';
 import { LogOut, User, Home, Users, Receipt } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
