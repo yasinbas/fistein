@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Receipt, UserPlus } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../utils/useAuth';
+import type { ApiError } from '../types';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -50,8 +51,9 @@ const Register: React.FC = () => {
         password: formData.password,
       });
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Kayıt olurken bir hata oluştu.');
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Kayıt olurken bir hata oluştu.');
     } finally {
       setLoading(false);
     }

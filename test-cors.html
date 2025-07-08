@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Frontend-Backend CORS Test</h1>
+    <p>This page tests CORS functionality between the frontend and backend.</p>
+    
+    <button onclick="testHealthCheck()">Test Health Check (GET)</button>
+    <button onclick="testAuthEndpoint()">Test Auth Endpoint (POST)</button>
+    <button onclick="testOptionsRequest()">Test OPTIONS Request</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            resultsDiv.appendChild(div);
+        }
+
+        async function testHealthCheck() {
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    addResult('✅ Health Check - CORS working for GET requests', true);
+                } else {
+                    addResult(`❌ Health Check failed: ${response.status}`, false);
+                }
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    addResult('❌ CORS Error on Health Check: ' + error.message, false);
+                } else {
+                    addResult('❌ Network Error on Health Check: ' + error.message, false);
+                }
+            }
+        }
+
+        async function testAuthEndpoint() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'test123'
+                    })
+                });
+                
+                // We expect this to fail with 401/400, but CORS should work
+                if (response.status === 401 || response.status === 400) {
+                    addResult('✅ Auth Endpoint - CORS working for POST requests (expected auth failure)', true);
+                } else if (response.ok) {
+                    addResult('✅ Auth Endpoint - CORS working for POST requests (unexpected success)', true);
+                } else {
+                    addResult(`❌ Auth Endpoint unexpected error: ${response.status}`, false);
+                }
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    addResult('❌ CORS Error on Auth Endpoint: ' + error.message, false);
+                } else {
+                    addResult('❌ Network Error on Auth Endpoint: ' + error.message, false);
+                }
+            }
+        }
+
+        async function testOptionsRequest() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type',
+                    }
+                });
+                
+                if (response.ok || response.status === 204) {
+                    addResult('✅ OPTIONS Preflight - CORS preflight working', true);
+                } else {
+                    addResult(`❌ OPTIONS Preflight failed: ${response.status}`, false);
+                }
+            } catch (error) {
+                addResult('❌ OPTIONS Preflight Error: ' + error.message, false);
+            }
+        }
+
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addResult('Starting CORS tests...', true);
+        });
+    </script>
+</body>
+</html>
