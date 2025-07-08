@@ -50,6 +50,10 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface GoogleLoginRequest {
+  idToken: string;
+}
+
 export interface RegisterRequest {
   username: string;
   email: string;
