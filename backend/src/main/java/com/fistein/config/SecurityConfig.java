@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +31,9 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     // CorsConfigurationSource, CorsConfig sınıfında tanımlanan bean'i kullanır
     private final CorsConfigurationSource corsConfigurationSource;
+    // CacheControlHeaderFilter, her response'a Cache-Control header'ı ekler.
+    @Autowired
+    private CacheControlHeaderFilter cacheControlHeaderFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,7 +60,9 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 // JWT kimlik doğrulama filtresini UsernamePasswordAuthenticationFilter'dan önce ekler.
                 // Bu, her istekte JWT token'ını kontrol etmeyi sağlar.
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                // Cache-Control header filtresini UsernamePasswordAuthenticationFilter'dan önce ekler.
+                .addFilterBefore(cacheControlHeaderFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Oluşturulan SecurityFilterChain'i döndürür.
         return http.build();
