@@ -16,35 +16,33 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // İzin verilen origin'ler (development için)
-        configuration.setAllowedOrigins(Arrays.asList(
+        // Use allowedOriginPatterns instead of allowedOrigins for better compatibility
+        configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000",  // React
                 "http://localhost:5173",  // Vite
                 "http://localhost:8081"   // React Native Expo
         ));
         
-        // İzin verilen HTTP metodları
+        // Allow all HTTP methods
         configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"
         ));
         
-        // İzin verilen header'lar
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin",
-                "X-Requested-With"
+        // Allow all headers including browser-generated security headers
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // Set to false to avoid conflicts with allowedOriginPatterns
+        configuration.setAllowCredentials(false);
+        
+        // Disable preflight cache during development to avoid caching issues
+        configuration.setMaxAge(0L);
+        
+        // Expose necessary headers that frontend might need
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization", "Content-Type", "Accept", "Origin", 
+                "Access-Control-Request-Method", "Access-Control-Request-Headers",
+                "Cache-Control", "Pragma", "Expires"
         ));
-        
-        // Credential'ların gönderilmesine izin ver
-        configuration.setAllowCredentials(true);
-        
-        // Preflight cache süresi (saniye) - Reduced to prevent caching issues
-        configuration.setMaxAge(60L);
-        
-        // Response'da görünmesine izin verilen header'lar
-        configuration.setExposedHeaders(List.of("Authorization", "Cache-Control"));
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

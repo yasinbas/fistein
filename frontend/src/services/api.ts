@@ -19,10 +19,9 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
   },
+  // Remove credentials to avoid CORS issues with wildcard origins
+  withCredentials: false,
 });
 
 // Request interceptor to add auth token
@@ -32,7 +31,7 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   
-  // Add timestamp to prevent caching
+  // Add timestamp to prevent caching for auth requests only
   if (config.url?.includes('/auth/')) {
     config.params = { ...config.params, _t: Date.now() };
   }
