@@ -21,6 +21,10 @@ spring:
 server:
   port: 8080
 
+jwt:
+  secret: dGhpc0lzQUdvb2RTZWNyZXRLZXlGb3JKV1RUaGF0SXNBVE1lYXN0MjU2Qml0c0xvbmdGb3JTZWN1cml0eVB1cnBvc2Vz
+  expiration: 86400
+
 google:
   oauth:
     client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
