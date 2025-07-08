@@ -20,3 +20,7 @@ spring:
 
 server:
   port: 8080
+
+google:
+  oauth:
+    client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}

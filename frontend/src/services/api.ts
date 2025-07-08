@@ -10,6 +10,7 @@ import type {
   CreateExpenseRequest,
   Balance,
   GroupBalance,
+  GoogleLoginRequest,
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
@@ -56,6 +57,11 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', credentials);
+    return response.data;
+  },
+
+  googleLogin: async (googleCredentials: GoogleLoginRequest): Promise<AuthResponse> => {
+    const response = await api.post('/auth/google', googleCredentials);
     return response.data;
   },
 

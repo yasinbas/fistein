@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { User, LoginRequest, RegisterRequest } from '../types';
+import type { User, LoginRequest, RegisterRequest, GoogleLoginRequest } from '../types';
 import { authAPI } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
+  googleLogin: (credentials: GoogleLoginRequest) => Promise<void>;
   register: (userData: RegisterRequest) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -64,6 +65,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const googleLogin = async (credentials: GoogleLoginRequest) => {
+    try {
+      const response = await authAPI.googleLogin(credentials);
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      setUser(response.user);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const register = async (userData: RegisterRequest) => {
     try {
       const response = await authAPI.register(userData);
@@ -85,6 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     loading,
     login,
+    googleLogin,
     register,
     logout,
     isAuthenticated: !!user,
