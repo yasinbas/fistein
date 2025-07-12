@@ -9,7 +9,7 @@ import {
   TrendingUp, 
   TrendingDown, 
   UserPlus,
-  Calendar,
+  //Calendar,
   DollarSign
 } from 'lucide-react';
 import { groupsAPI, expensesAPI } from '../services/api';

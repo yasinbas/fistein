@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Receipt, Save, Users, Calculator, DollarSign } from 'lucide-react';
 import { expensesAPI, groupsAPI } from '../services/api';
-import { useAuth } from '../utils/useAuth';
 import type { Group, CreateExpenseRequest } from '../types';
 
 const CreateExpense: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -31,7 +29,7 @@ const CreateExpense: React.FC = () => {
       try {
         const groupsData = await groupsAPI.getGroups();
         setGroups(groupsData);
-        
+
         // Check if groupId is provided in URL params
         const groupIdParam = searchParams.get('groupId');
         if (groupIdParam) {
@@ -57,7 +55,7 @@ const CreateExpense: React.FC = () => {
       if (!isNaN(amount) && splitMethod === 'equal') {
         const membersCount = selectedGroup.members?.length || 0;
         const equalShare = membersCount > 0 ? amount / membersCount : 0;
-        
+
         const newMemberAmounts: { [userId: number]: number } = {};
         selectedGroup.members?.forEach(member => {
           newMemberAmounts[member.user.id] = equalShare;
@@ -70,12 +68,12 @@ const CreateExpense: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     if (name === 'groupId') {
       const group = groups.find(g => g.id.toString() === value);
       setSelectedGroup(group || null);
     }
-    
+
     if (error) setError('');
   };
 
@@ -93,17 +91,17 @@ const CreateExpense: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       setError('Harcama başlığı gereklidir');
       return;
     }
-    
+
     if (!formData.amount || isNaN(parseFloat(formData.amount))) {
       setError('Geçerli bir tutar giriniz');
       return;
     }
-    
+
     if (!formData.groupId) {
       setError('Grup seçimi gereklidir');
       return;
@@ -111,7 +109,7 @@ const CreateExpense: React.FC = () => {
 
     const totalAmount = parseFloat(formData.amount);
     const totalMemberAmounts = getTotalMemberAmounts();
-    
+
     if (Math.abs(totalAmount - totalMemberAmounts) > 0.01) {
       setError('Paylaşılan tutarların toplamı harcama tutarına eşit olmalıdır');
       return;
@@ -130,7 +128,7 @@ const CreateExpense: React.FC = () => {
         memberAmounts: memberAmounts,
       };
 
-      const newExpense = await expensesAPI.createExpense(expenseData);
+      await expensesAPI.createExpense(expenseData);
       navigate(`/groups/${formData.groupId}`);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Harcama eklenirken bir hata oluştu');
@@ -178,7 +176,7 @@ const CreateExpense: React.FC = () => {
         {/* Basic Information */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Harcama Bilgileri</h2>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               <p className="text-red-700">{error}</p>
@@ -282,7 +280,7 @@ const CreateExpense: React.FC = () => {
         {selectedGroup && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Paylaşım Ayarları</h2>
-            
+
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Paylaşım Yöntemi
