@@ -6,6 +6,7 @@ import com.fistein.dto.GoogleLoginRequest;
 import com.fistein.dto.JwtResponse;
 import com.fistein.service.AuthService;
 import com.fistein.service.GoogleOAuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class AuthController {
     private final GoogleOAuthService googleOAuthService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<JwtResponse> register(@Valid @RequestBody RegisterRequest request) {
         JwtResponse response = authService.register(request);
         return ResponseEntity.ok()
                 .header("Cache-Control", "no-cache, no-store, must-revalidate")

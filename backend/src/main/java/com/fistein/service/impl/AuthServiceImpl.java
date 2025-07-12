@@ -29,14 +29,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtResponse register(RegisterRequest request) {
+        // Input validation
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new RuntimeException("İsim boş olamaz");
+        }
+        
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("Email boş olamaz");
+        }
+        
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new RuntimeException("Şifre boş olamaz");
+        }
+        
         // Email kontrolü
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail().trim())) {
             throw new RuntimeException("Bu email adresi zaten kullanılıyor");
         }
 
         var user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
+                .name(request.getName().trim())
+                .email(request.getEmail().trim().toLowerCase())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
