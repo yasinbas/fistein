@@ -2,6 +2,9 @@
 
 **Fiştein**, arkadaş grupları ve ev arkadaşları için geliştirilmiş bir ortak gider takibi uygulamasıdır. Splitwise benzeri sade bir arayüz sunar. Hem web hem de mobil platformlarda çalışacak şekilde tasarlanmıştır.
 
+<img width="1894" height="828" alt="image" src="https://github.com/user-attachments/assets/7b4e0eee-a6c7-4a37-935b-5e232f37eb06" />
+
+
 ---
 
 ## 🚀 Özellikler
