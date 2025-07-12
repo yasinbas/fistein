@@ -35,12 +35,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         var user = User.builder()
-                .name(request.getName())
+                .name(request.getFullName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        userRepository.save(user);
+        // Kullanıcıyı kaydettikten sonra geri al (id ve createdAt için)
+        user = userRepository.save(user);
 
         // JWT token üretimi için UserDetails kullanılıyor
         var userDetails = userDetailsService.loadUserByUsername(user.getEmail());

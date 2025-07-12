@@ -108,19 +108,20 @@ public class ExpenseServiceImpl implements ExpenseService {
         // Paylaşım tipi veya paylaşımlar değiştiyse
         if (request.getSplitType() != null || request.getShares() != null) {
             // Mevcut paylaşımları sil
+            Set<ExpenseShare> sharesToDelete = new HashSet<>(expense.getShares());
             expense.getShares().clear();
-            expenseShareRepository.deleteAll(expense.getShares());
-            
+            expenseShareRepository.deleteAll(sharesToDelete);
+
             if (request.getSplitType() != null) {
                 expense.setSplitType(request.getSplitType());
             }
-            
+
             // Yeni paylaşımları oluştur
             CreateExpenseRequest createRequest = new CreateExpenseRequest();
             createRequest.setSplitType(expense.getSplitType());
             createRequest.setShares(request.getShares());
             createRequest.setAmount(expense.getAmount());
-            
+
             createExpenseShares(expense, createRequest, expense.getGroup());
         }
 
@@ -223,7 +224,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                         .amount(BigDecimal.ZERO)
                         .expenseCount(0)
                         .build());
-                
+
                 UserBalanceResponse.DebtDetail debt = debtMap.get(creditorId);
                 debt.setAmount(debt.getAmount().add(share.getShareAmount()));
                 debt.setExpenseCount(debt.getExpenseCount() + 1);
@@ -240,7 +241,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                             .amount(BigDecimal.ZERO)
                             .expenseCount(0)
                             .build());
-                    
+
                     UserBalanceResponse.CreditDetail credit = creditMap.get(debtorId);
                     credit.setAmount(credit.getAmount().add(share.getShareAmount()));
                     credit.setExpenseCount(credit.getExpenseCount() + 1);
@@ -404,8 +405,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     private UserResponse mapToUserResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .username(user.getName())
+                .username(user.getEmail())
                 .email(user.getEmail())
+                .fullName(user.getName())
                 .build();
     }
 }
