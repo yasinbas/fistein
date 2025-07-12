@@ -13,12 +13,14 @@ export interface Group {
   createdBy: User;
   createdAt: string;
   members: GroupMember[];
+  isUserAdmin?: boolean;
 }
 
 export interface GroupMember {
   id: number;
   user: User;
   joinedAt: string;
+  isAdmin?: boolean;
 }
 
 export interface Expense {
