@@ -6,13 +6,11 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-
-// Placeholder components for routes that will be implemented later
-const Groups = () => <div className="card"><h2>Gruplar - Yakında gelecek</h2></div>;
-const CreateGroup = () => <div className="card"><h2>Grup Oluştur - Yakında gelecek</h2></div>;
-const GroupDetail = () => <div className="card"><h2>Grup Detayı - Yakında gelecek</h2></div>;
-const Expenses = () => <div className="card"><h2>Harcamalar - Yakında gelecek</h2></div>;
-const CreateExpense = () => <div className="card"><h2>Harcama Ekle - Yakında gelecek</h2></div>;
+import Groups from './pages/Groups';
+import CreateGroup from './pages/CreateGroup';
+import GroupDetail from './pages/GroupDetail';
+import Expenses from './pages/Expenses';
+import CreateExpense from './pages/CreateExpense';
 
 const AuthenticatedApp: React.FC = () => {
   return (
